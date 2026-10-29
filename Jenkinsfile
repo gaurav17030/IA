@@ -1,56 +1,46 @@
 pipeline {
-    agent any
-
-    environment {
+agent any
+environment {
         DOCKER_IMAGE = "gaurav0006/app"
     }
-
-    stages {
-        stage('Clone Repository') {
-            steps {
-                git branch: 'master',
-                    url: 'https://github.com/gaurav17030/IA.git
-'
-            }
+stages {
+    stage('Clone Repository') {
+        steps{
+             git branch: 'master',
+             url: 'https://github.com/gaurav17030/IA.git
+}
         }
-
-        stage('Build Docker Image') {
-            steps {
-                bat 'dir'
-                bat 'docker build -t %DOCKER_IMAGE%:v1 .'
-            }
-        }
-
-        stage('Login to Docker Hub') {
-            steps {
-                withCredentials([string(
-                    credentialsId: 'dockerhub-PAT',
-                    variable: 'DOCKER_PAT'
+stage('Build Docker Image') {
+     steps {
+         bat 'dir'
+            bat 'docker build -t %DOCKER_IMAGE%:v1 .'
+}}
+stage('Login to Docker Hub') {
+     steps {
+        withCredentials([string(
+            credentialsId: 'dockerhub-PAT',
+            variable: 'DOCKER_PAT'
                 )]) {
-                    bat '''
-                    @echo off
-                    echo %DOCKER_PAT%|docker login -u gaurav0006 --password-stdin
-                   if errorlevel 1 exit /b 1
-                    '''
-                }
-            }
-        }
-
-        stage('Push Docker Image') {
-            steps {
-                bat 'docker push %DOCKER_IMAGE%:v1'
-            }
-        }
+                bat '''
+                @echo off
+                echo %DOCKER_PAT%|docker login -u gaurav0006 --password-stdin
+                if errorlevel 1 exit /b 1
+                  '''
+             }
+         }
     }
-
-    post {
-        success {
-            echo 'Docker image built and pushed successfully.'
-        }
-        failure {
-            echo 'Pipeline failed. Check Console Output.'
-        }
+stage('Push Docker Image') {
+    steps {
+            bat 'docker push %DOCKER_IMAGE%:v1'
+            }
+        }}
+post {
+ success {
+        echo 'Docker image built and pushed successfully.'
+     }
+     failure {
+        echo 'Pipeline failed. Check Console Output.'
     }
-}     
+ }}     
 
         
